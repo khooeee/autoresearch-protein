@@ -63,38 +63,34 @@ FINAL_BEST_VAL_LOSS=...
 
 Lower `FINAL_BEST_VAL_LOSS` is better.
 
-## Current Model
-
-`train.py` currently uses:
-
-- character-level tokenization: newline plus `ACDEFGHIKLMNPQRSTVWY`
-- block size: 256
-- batch size: 64
-- max training steps: 2000
-- evaluation interval: 200 steps
-- optimizer: AdamW with learning rate `3e-4`
-- model: 4-layer causal Transformer encoder, 128 embedding size, 4 attention
-  heads, GELU feed-forward layers, dropout `0.1`
-- device selection: CUDA, then Apple MPS, then CPU
-
 ## Experiment Workflow
 
-Read `program.md` before changing the model. The core loop is:
+Read `program.md` before changing the model. A comparable experiment series
+should run on a dedicated `autoresearch/<tag>` branch and keep the validation
+data fixed. The core loop is:
 
 1. Edit `train.py`.
-2. Run:
+2. Commit the experimental code change.
+3. Run:
 
    ```sh
-   uv run python train.py
+   uv run python train.py > run.log 2>&1
    ```
 
-3. Record the experiment and `FINAL_BEST_VAL_LOSS` in `results.md`.
-4. Keep the change only if validation loss improves.
-5. Revert changes that make validation loss worse.
+4. Extract `FINAL_BEST_VAL_LOSS` from `run.log`.
+5. Record the experiment and result in `results.md`.
+6. Keep the change only if validation loss improves.
+7. Revert changes that make validation loss worse.
 
 Useful experiment directions include learning-rate schedules, dropout, batch
 size, model width/depth, gradient clipping, k-mer tokenization, sequence-aware
 batching, and masking behavior around newline tokens.
+
+## Prompt
+
+```
+You are now the autonomous researcher for this repo. Read program.md and execute it exactly. Do not ask for confirmation after setup; once the loop begins, keep running experiments indefinitely until interrupted.
+```
 
 ## Notes
 
