@@ -42,15 +42,17 @@ The goal is simple: get the lowest `FINAL_BEST_VAL_LOSS`. This is validation
 cross-entropy, and lower is better.
 
 **What you CAN do:**
-- Modify `train.py`. Everything in that file is fair game: model architecture,
-  optimizer, learning rate, batch size, context length, tokenization, batching,
-  masking, training loop, evaluation cadence, and sampling strategy.
-- Try concrete ideas such as learning-rate changes, batch-size changes, dropout
-  changes, model width/depth changes, CNN/RNN/state-space/Transformer variants,
-  k-mer tokenization, sequence-aware batching, newline-token masking or
-  downweighting, weight decay, cosine learning-rate schedules, warmup, gradient
-  clipping, sequence length changes, tied input/output embeddings, and optimizer
-  parameter grouping.
+- Modify `train.py`. Everything in that file is fair game, including model
+  architecture, optimizer, hyperparameters, training loop, batching, masking,
+  evaluation cadence, sampling strategy, and tokenization. Additional ideas include:
+  - optimization changes: learning rate, cosine schedule, warmup, weight decay,
+    gradient clipping, optimizer parameter grouping
+  - capacity changes: batch size, block size/context length, dropout, model
+    width/depth
+  - architecture changes: CNN baselines, RNN/state-space/Transformer variants,
+    tied input/output embeddings
+  - data and tokenization changes: better sequence-aware batching, k-mer
+    tokenization, newline-token masking or downweighting
 - Make small documentation or ignore-file updates if they help the experiment
   workflow.
 
