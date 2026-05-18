@@ -77,10 +77,11 @@ data fixed. The core loop is:
    uv run python train.py > run.log 2>&1
    ```
 
-4. Extract `FINAL_BEST_VAL_LOSS` from `run.log`.
-5. Record the experiment and result in `results.md`.
-6. Keep the change only if validation loss improves.
-7. Revert changes that make validation loss worse.
+4. Stop the run if it exceeds the 30-minute maximum timeout.
+5. Extract `FINAL_BEST_VAL_LOSS` from `run.log`.
+6. Record the experiment and result in `results.md`.
+7. Keep the change only if validation loss improves.
+8. Revert changes that make validation loss worse.
 
 Useful experiment directions include learning-rate schedules, dropout, batch
 size, model width/depth, gradient clipping, k-mer tokenization, sequence-aware

@@ -96,8 +96,8 @@ Use the existing section-and-bullets format:
 ```md
 Experiment Name:
 - Commit: <short git hash or Baseline>
-- Val loss: <FINAL_BEST_VAL_LOSS or crash>
-- Status: <keep, discard, or crash>
+- Val loss: <FINAL_BEST_VAL_LOSS, crash, or timeout>
+- Status: <keep, discard, crash, or timeout>
 - Description: <short description of what changed>
 ```
 
@@ -106,8 +106,8 @@ Field meanings:
 1. `Commit`: short git commit hash, usually 7 characters. Use `Baseline` for
    the initial baseline entry if no experiment commit exists yet.
 2. `Val loss`: `FINAL_BEST_VAL_LOSS`, such as `1.2345`. Use `crash` if the run
-   did not produce the metric.
-3. `Status`: `keep`, `discard`, or `crash`.
+   failed before producing the metric, and `timeout` if it exceeded 30 minutes.
+3. `Status`: `keep`, `discard`, `crash`, or `timeout`.
 4. `Description`: short text describing the change.
 
 Example:
@@ -136,6 +136,12 @@ Experiment 3:
 - Val loss: crash
 - Status: crash
 - Description: double context length caused OOM
+
+Experiment 4:
+- Commit: e5f6a7b
+- Val loss: timeout
+- Status: timeout
+- Description: wider model exceeded 30-minute limit
 ```
 
 Commit code changes.
@@ -149,7 +155,8 @@ LOOP FOREVER:
 1. Look at the git state: current branch, current commit, and dirty files.
 2. Pick one experimental idea and edit `train.py` directly.
 3. Commit the code change.
-4. Run the experiment with redirected output:
+4. Run the experiment with redirected output and enforce a 30-minute maximum
+   timeout using the available tool or shell timeout mechanism:
 
    ```sh
    uv run python train.py > run.log 2>&1
@@ -179,9 +186,10 @@ The idea is that you are an autonomous researcher trying things out. If they
 work, keep them. If they do not, discard them. Advance the branch only when the
 validation metric improves.
 
-**Timeout**: If a run takes much longer than the normal baseline time for this
-machine, kill it and treat it as a failure unless the user explicitly approved a
-larger experiment.
+**Timeout**: Each experiment has a maximum timeout of 30 minutes. If a run
+exceeds 30 minutes, kill it, record it in `results.md` with `Val loss: timeout`
+and `Status: timeout`, and reset back to the pre-experiment commit unless the
+user explicitly approved a larger experiment.
 
 **Crashes**: Use judgment. Fix obvious implementation mistakes. Do not spend a
 long time rescuing an idea that is complicated, memory-hungry, or inconsistent
