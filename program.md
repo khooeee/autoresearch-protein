@@ -91,17 +91,20 @@ grep "^step " run.log | tail -n 5
 When an experiment is done, log it in `results.md`. Keep `results.md` as the
 human-readable Markdown ledger for this repo.
 
-Use a compact table with these columns:
+Use the existing section-and-bullets format:
 
 ```md
-| Commit | Val loss | Status | Description |
-| --- | ---: | --- | --- |
+Experiment Name:
+- Commit: <short git hash or Baseline>
+- Val loss: <FINAL_BEST_VAL_LOSS or crash>
+- Status: <keep, discard, or crash>
+- Description: <short description of what changed>
 ```
 
-Column meanings:
+Field meanings:
 
-1. `Commit`: short git commit hash, usually 7 characters. Use `none` for the
-   initial uncommitted baseline only if no commit exists yet.
+1. `Commit`: short git commit hash, usually 7 characters. Use `Baseline` for
+   the initial baseline entry if no experiment commit exists yet.
 2. `Val loss`: `FINAL_BEST_VAL_LOSS`, such as `1.2345`. Use `crash` if the run
    did not produce the metric.
 3. `Status`: `keep`, `discard`, or `crash`.
@@ -110,16 +113,32 @@ Column meanings:
 Example:
 
 ```md
-| Commit | Val loss | Status | Description |
-| --- | ---: | --- | --- |
-| a1b2c3d | 1.2345 | keep | baseline |
-| b2c3d4e | 1.2101 | keep | increase embedding size to 192 |
-| c3d4e5f | 1.2600 | discard | reduce dropout to zero |
-| d4e5f6a | crash | crash | double context length caused OOM |
+Baseline:
+- Commit: Baseline
+- Val loss: 1.2345
+- Status: keep
+- Description: initial work
+
+Experiment 1:
+- Commit: b2c3d4e
+- Val loss: 1.2101
+- Status: keep
+- Description: increase embedding size to 192
+
+Experiment 2:
+- Commit: c3d4e5f
+- Val loss: 1.2600
+- Status: discard
+- Description: reduce dropout to zero
+
+Experiment 3:
+- Commit: d4e5f6a
+- Val loss: crash
+- Status: crash
+- Description: double context length caused OOM
 ```
 
-Commit code changes, but do not commit `results.md` updates unless the user asks
-you to make a checkpoint commit that includes the ledger.
+Commit code changes.
 
 ## The Experiment Loop
 
