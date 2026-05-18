@@ -23,7 +23,7 @@ To set up a new experiment series, work with the user to:
    If not, tell the human to follow the README data setup and run
    `uv run python prepare_data.py`.
 5. **Initialize results.md**: if it does not already contain a clear experiment
-   table, add one before the first run. The baseline will be recorded after the
+   entry, add one before the first run. The baseline will be recorded after the
    first run.
 6. **Confirm and go**: confirm setup looks good, then begin experimentation.
 
@@ -45,6 +45,12 @@ cross-entropy, and lower is better.
 - Modify `train.py`. Everything in that file is fair game: model architecture,
   optimizer, learning rate, batch size, context length, tokenization, batching,
   masking, training loop, evaluation cadence, and sampling strategy.
+- Try concrete ideas such as learning-rate changes, batch-size changes, dropout
+  changes, model width/depth changes, CNN/RNN/state-space/Transformer variants,
+  k-mer tokenization, sequence-aware batching, newline-token masking or
+  downweighting, weight decay, cosine learning-rate schedules, warmup, gradient
+  clipping, sequence length changes, tied input/output embeddings, and optimizer
+  parameter grouping.
 - Make small documentation or ignore-file updates if they help the experiment
   workflow.
 
@@ -168,7 +174,10 @@ LOOP FOREVER:
    grep "^FINAL_BEST_VAL_LOSS=" run.log
    ```
 
-6. If the grep output is empty, the run crashed. Read the stack trace:
+6. If the run exceeded 30 minutes, kill it, record it in `results.md` with
+   `Val loss: timeout` and `Status: timeout`, reset back to the pre-experiment
+   commit, and move on unless the user explicitly approved a larger experiment.
+7. If the grep output is empty, the run crashed. Read the stack trace:
 
    ```sh
    tail -n 80 run.log
@@ -177,19 +186,16 @@ LOOP FOREVER:
    If the crash is a simple typo or shape bug, fix it and rerun. If the idea is
    fundamentally broken or too expensive, log `crash` in `results.md`, reset the
    branch back to the pre-experiment commit, and move on.
-7. Record the result in `results.md`.
-8. If validation loss improved, keep the commit and advance the branch.
-9. If validation loss is equal or worse, mark it `discard` in `results.md` and
+8. Record the result in `results.md`.
+9. If validation loss improved, keep the commit and advance the branch.
+10. If validation loss is equal or worse, mark it `discard` in `results.md` and
    reset back to the pre-experiment commit.
 
 The idea is that you are an autonomous researcher trying things out. If they
 work, keep them. If they do not, discard them. Advance the branch only when the
 validation metric improves.
 
-**Timeout**: Each experiment has a maximum timeout of 30 minutes. If a run
-exceeds 30 minutes, kill it, record it in `results.md` with `Val loss: timeout`
-and `Status: timeout`, and reset back to the pre-experiment commit unless the
-user explicitly approved a larger experiment.
+**Timeout**: The maximum timeout is 30 minutes per experiment.
 
 **Crashes**: Use judgment. Fix obvious implementation mistakes. Do not spend a
 long time rescuing an idea that is complicated, memory-hungry, or inconsistent
@@ -200,28 +206,3 @@ to continue. The human may expect the system to run unattended. If you run out
 of obvious ideas, re-read the code, inspect near-misses in `results.md`, combine
 promising changes, simplify existing code, or try a more substantial
 architecture change.
-
-## Ideas To Try
-
-- learning-rate changes
-- batch-size changes
-- dropout changes
-- model width/depth changes
-- CNN, RNN, state-space, or Transformer variants
-- k-mer tokenization
-- sequence-aware batching so batches do not cross protein boundaries
-- masking or downweighting newline tokens
-- weight decay
-- cosine learning-rate schedule
-- warmup
-- gradient clipping
-- sequence length changes
-- tied input/output embeddings
-- optimizer parameter grouping
-- evaluation sample count changes only if the metric remains comparable
-
-## Important
-
-The score is validation cross-entropy printed as `FINAL_BEST_VAL_LOSS`. Lower is
-better. Keep the validation data fixed, record every experiment in `results.md`,
-and prefer improvements that make the system easier to understand.
