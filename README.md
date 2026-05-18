@@ -42,8 +42,7 @@ The preparation script:
 - keeps sequences with length from 40 to 1024
 - shuffles with seed `42`
 - writes `data/train.txt` and `data/val.txt`
-- uses 5% of filtered sequences for validation, with a minimum of 1000
-  validation sequences
+- uses 5% of filtered sequences for validation, with a minimum of 1000 validation sequences
 
 ## Train
 
